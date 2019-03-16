@@ -56,7 +56,7 @@ checkForLetter:
         goto checkForLetter;
     
     else {
-        while (word[letter_count+1] != '\0') {
+        while (word[letter_count] != '\0') {
             TrieNode* Node = new TrieNode;
             Node->alpha = word[letter_count];
             
