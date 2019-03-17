@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
 
 
 struct TrieNode {
