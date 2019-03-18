@@ -12,9 +12,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
 
-using namespace std;
 
 struct TrieNode {
 	char alpha;
@@ -68,8 +66,7 @@ void display(TrieNode* root, char word_suggestion[], short count) {
         std::cout << word_suggestion << std::endl;
     }
 
-    short i;
-    for (i=0 ; i<SIZE ; i++) {
+    for (short i=0 ; i<SIZE ; i++) {
         if (root->children[i] != 0) {
             word_suggestion[count] = root->alpha;
             display(root->children[i], word_suggestion, count+1);
@@ -80,8 +77,8 @@ void display(TrieNode* root, char word_suggestion[], short count) {
 
 
 void openFile() {
-    ifstream wordFile;
-    wordFile.open("/Users/saroopa/Desktop/Data Structures/Package/testWords.txt");
+	std::ifstream wordFile;
+    wordFile.open("/Users/saroopa/Desktop/Data Structures/Package/qWords.txt");
     if (!wordFile) {
         std::cout << "Couldn't open file." << std::endl;
     }
@@ -98,12 +95,9 @@ void openFile() {
 int main() {
     initializeRoot();
     openFile();
-    
+	
     char word[20];
     display(root, word, 0);
 
-    std::cout << word << std::endl;
-    
-    
     return 0;
 }
