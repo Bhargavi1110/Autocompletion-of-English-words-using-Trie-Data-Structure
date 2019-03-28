@@ -5,20 +5,18 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
-using namespace std;
 
+using namespace std;
 
 struct TrieNode {
 	char alpha;
 	bool isEndOfWord;
 	TrieNode* children[SIZE];
 };
-struct TrieNode* root;
-
+TrieNode* root;
 
 void initializeRoot() {
 	root = new TrieNode;
-	root->alpha = 'q';
 	root->isEndOfWord = false;
 	
 	for (int i=0 ; i<SIZE ; i++) {
@@ -26,12 +24,12 @@ void initializeRoot() {
 	}
 }
 
-void insertWord(const std::string &word) {
+
+void insertWord(const string &word) {
 	TrieNode *p = root;
-//	cout<<"\n";
-	for (short i=1 ; i<word.length() ; i++){
+	for (short i=0 ; i<word.length() ; i++){
 		short j;
-		for (j=0 ; j<SIZE && (p->children[j] != 0) ;) {
+		for (j=0 ; j<SIZE && (p->children[j] != 0) ; ) {
 			if ((p->children[j])->alpha == word[i]) {
 				p = p->children[j];
 				j=0;
@@ -47,7 +45,6 @@ void insertWord(const std::string &word) {
 			Node->children[k] = 0;
 		p->children[j] = Node;
 		p = p->children[j];
-//		cout<< p->alpha;
 	}
 	p->isEndOfWord = true;
 }
@@ -73,25 +70,39 @@ void traverseTrie(char word[]){
 	char word_suggestion[20];
 	TrieNode *p = root;
 	strcpy(word_suggestion, word);
-	int i = 0;
-	while(word[i+1] != '\0'){
-		if(word[i] == p->alpha)
-			for(short j=0 ; j<SIZE ; j++)
-				if(word[i+1] == (p->children[j])->alpha) {
-					p = p->children[j];
-					break;
-				}
-		i++;
-			//std::cout<<i;
+	
+	short j;
+	for (j=0 ; j<SIZE && p->children[j]!=0 ; j++) {
+		if (p->children[j]->alpha == word[0]) {
+			p = p->children[j];
+			break;
+		}
 	}
-//	cout<<word_suggestion;
-	display(p, word_suggestion, i);
+	
+	if (j != SIZE) {
+		int i = 0;
+		while(word[i+1] != '\0'){
+			if(word[i] == p->alpha)
+				for(short j=0 ; j<SIZE ; j++)
+					if(word[i+1] == (p->children[j])->alpha) {
+						p = p->children[j];
+						break;
+					}
+			i++;
+		}
+		display(p, word, i);
+	}
+	else {
+		cout << "No word can be formed using the letters typed." << endl;
+	}
 }
-void openFile() {
+
+bool openFile() {
 	ifstream wordFile;
-	wordFile.open("/Users/saroopa/Desktop/Data Structures/Package/qWords.txt");
+	wordFile.open("/Users/saroopa/Desktop/Data Structures/EnglishWords.txt");
 	if (!wordFile) {
 		cout << "Couldn't open file." << endl;
+		return false;
 	}
 	else {
 		string word;
@@ -99,21 +110,18 @@ void openFile() {
 			getline(wordFile, word);
 			insertWord(word);
 		}
+		return true;
 	}
 }
 
 
 int main() {
 	initializeRoot();
-	openFile();
-        
-//	char word[20];
-//	display(root, word, 0);
-	
-        char phrase[20];
-	cout<<"Enter word beginning:  ";
-        cin>>phrase;
-	traverseTrie(phrase);        
-
+	if(openFile()) {
+		char phrase[20];
+		cout<<"Enter beginning letters of a word:  ";
+		cin>>phrase;
+		traverseTrie(phrase);
+	}
 	return 0;
 }
