@@ -1,103 +1,124 @@
-//
-//  main.cpp
-//  WordComplete
-//
-//  Created by Saroopa on 3/15/19.
-//  Copyright © 2019 Saroopa-Bhargavi. All rights reserved.
-//
-
 #ifndef SIZE
 #define SIZE 26
 #endif
 
 #include <iostream>
 #include <fstream>
+#include <string.h>
 
+using namespace std;
 
 struct TrieNode {
 	char alpha;
 	bool isEndOfWord;
 	TrieNode* children[SIZE];
 };
-struct TrieNode* root;
-
+TrieNode* root;
 
 void initializeRoot() {
-    root = new TrieNode;
-    root->alpha = 'q';
-    root->isEndOfWord = false;
-    
-    for (int i=0 ; i<SIZE ; i++) {
-        root->children[i] = 0;
-    }
+	root = new TrieNode;
+	root->isEndOfWord = false;
+
+	for (int i=0 ; i<SIZE ; i++) {
+		root->children[i] = 0;
+	}
 }
 
 
-void insertWord(const std::string& word) {
-    TrieNode* p = root;
-    
-    for (short i=1 ; i<word.length() ; i++) {
-        
-        short index = word[i] - 'a';
-        if (p->children[index] == 0) {
-            
-            TrieNode* Node = new TrieNode;
-            Node->isEndOfWord = false;
-            Node->alpha = word[i];
-            std::cout << word[i];
-            
-            for (short i=0 ; i<SIZE; i++) {
-                Node->children[i] = 0;
+void insertWord(const string &word) {
+	TrieNode *p = root;
+	for (short i=0 ; i<word.length() ; i++){
+		short j;
+		for (j=0 ; j<SIZE && (p->children[j] != 0) ; ) {
+			if ((p->children[j])->alpha == word[i]) {
+				p = p->children[j];
+				j=0;
+				i++;
+			}
+			else
+				j++;
+		}
+		TrieNode* Node = new TrieNode;
+		Node->isEndOfWord = false;
+		Node->alpha = word[i];
+		for (short k=0 ; k<SIZE; k++)
+			Node->children[k] = 0;
+		p->children[j] = Node;
+		p = p->children[j];
+	}
+	p->isEndOfWord = true;
+}
+
+
+void display(TrieNode* root, char word_suggestion[], short counts) {
+	if (root->isEndOfWord) {
+			//cout<<root->alpha<<endl;
+		word_suggestion[counts] = root->alpha;
+		word_suggestion[counts+1] = '\0';
+		cout << word_suggestion << endl;
+	}
+	for (short i=0 ; i<SIZE ; i++) {
+		if (root->children[i] != 0) {
+				//cout<< root->alpha;
+			word_suggestion[counts] = root->alpha;
+			display(root->children[i], word_suggestion, counts+1);
+		}
+	}
+}
+
+void traverseTrie(char word[]){
+	char word_suggestion[20];
+	TrieNode *p = root;
+	TrieNode *prev = 0;
+	int display_flag = 0;
+	int i = 0;
+	int flag = 0;
+
+	while (word[i] != '\0') {
+        prev = p;
+        for (short j=0 ; j<SIZE ; j++) {
+            if (p->children[j] != 0 && (p->children[j])->alpha == word[i]) {
+                p = p->children[j];
             }
-
-            p->children[index] = Node;
         }
-        p = p->children[index];
-    }
-    
-    p->isEndOfWord = true;
-    std::cout << std::endl;
+        i++;
+        //cout<<p->alpha<<endl;
+        if(prev == p) {
+            cout<<"No match found !"<<endl;
+            flag = 1;
+            break;
+        }
+	}
+
+    if(flag == 0)
+        display(p, word, --i);
 }
 
-
-void display(TrieNode* root, char word_suggestion[], short count) {
-    if (root->isEndOfWord) {
-        word_suggestion[count] = '\0';
-        std::cout << word_suggestion << std::endl;
-    }
-
-    for (short i=0 ; i<SIZE ; i++) {
-        if (root->children[i] != 0) {
-            word_suggestion[count] = root->alpha;
-            display(root->children[i], word_suggestion, count+1);
-        }
-    }
-
-}
-
-
-void openFile() {
-	std::ifstream wordFile;
-    wordFile.open("/Users/saroopa/Desktop/Data Structures/Package/qWords.txt");
-    if (!wordFile) {
-        std::cout << "Couldn't open file." << std::endl;
-    }
-    else {
-        std::string word;
-        while (!wordFile.eof()) {
-            getline(wordFile, word);
-            insertWord(word);
-        }
-    }
+bool openFile() {
+	ifstream wordFile;
+	wordFile.open("C:\\Users\\JARVIS\\Desktop\\Bhargavi\\College\\Sem 2\\DS Lab-C\\Package\\EnglishWords.txt");
+	if (!wordFile) {
+		cout << "Couldn't open file." << endl;
+		return false;
+	}
+	else {
+		string word;
+		while (!wordFile.eof()) {
+			getline(wordFile, word);
+			insertWord(word);
+		}
+		return true;
+	}
 }
 
 
 int main() {
-    initializeRoot();
-    openFile();
-	
-    char word[20];
-    display(root, word, 0);
-
-    return 0;
+	initializeRoot();
+	if(openFile()) {
+		char phrase[20];
+		cout<<"Enter beginning letters of a word:  ";
+		cin>>phrase;
+		traverseTrie(phrase);
+	}
+	return 0;
 }
