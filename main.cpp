@@ -18,12 +18,16 @@ TrieNode* root;
 void initializeRoot() {
 	root = new TrieNode;
 	root->isEndOfWord = false;
-
+	
 	for (int i=0 ; i<SIZE ; i++) {
 		root->children[i] = 0;
 	}
 }
 
+	for (int i=0 ; i<SIZE ; i++) {
+		root->children[i] = 0;
+	}
+}
 
 void insertWord(const string &word) {
 	TrieNode *p = root;
@@ -96,7 +100,44 @@ void traverseTrie(char word[]){
 
 bool openFile() {
 	ifstream wordFile;
-	wordFile.open("C:\\Users\\JARVIS\\Desktop\\Bhargavi\\College\\Sem 2\\DS Lab-C\\Package\\EnglishWords.txt");
+	wordFile.open("EnglishWords.txt");
+
+}
+
+void traverseTrie(char word[]){
+	char word_suggestion[20];
+	TrieNode *p = root;
+	strcpy(word_suggestion, word);
+	
+	short j;
+	for (j=0 ; j<SIZE && p->children[j]!=0 ; j++) {
+		if (p->children[j]->alpha == word[0]) {
+			p = p->children[j];
+			break;
+		}
+	}
+	
+	if (j != SIZE) {
+		int i = 0;
+		while(word[i+1] != '\0'){
+			if(word[i] == p->alpha)
+				for(short j=0 ; j<SIZE ; j++)
+					if(word[i+1] == (p->children[j])->alpha) {
+						p = p->children[j];
+						break;
+					}
+			i++;
+		}
+		display(p, word, i);
+	}
+	else {
+		cout << "No word can be formed using the letters typed." << endl;
+	}
+}
+
+bool openFile() {
+	ifstream wordFile;
+	wordFile.open("/Users/saroopa/Desktop/Data Structures/EnglishWords.txt");
 	if (!wordFile) {
 		cout << "Couldn't open file." << endl;
 		return false;
